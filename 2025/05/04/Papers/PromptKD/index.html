@@ -30,7 +30,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://yykwd.github.io/images/redefine-og.webp">
 <meta property="article:published_time" content="2025-05-04T12:43:43.000Z">
-<meta property="article:modified_time" content="2025-05-05T07:13:15.407Z">
+<meta property="article:modified_time" content="2025-05-06T03:20:51.127Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="知识蒸馏">
 <meta property="article:tag" content="提示学习">
@@ -504,8 +504,8 @@ mjx-container[display="true"] + br {
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2025-05-05 15:13:15</span>
-            <span class="mobile">2025-05-05 15:13:15</span>
+            <span class="desktop">2025-05-06 11:20:51</span>
+            <span class="mobile">2025-05-06 11:20:51</span>
             <span class="hover-info">Updated</span>
         </span>
     
@@ -592,7 +592,7 @@ mjx-container[display="true"] + br {
 <hr>
 <h2 id="背景：大模型压缩的新挑战"><a href="#背景：大模型压缩的新挑战" class="headerlink" title="背景：大模型压缩的新挑战"></a>背景：大模型压缩的新挑战</h2><p>近年来，CLIP 等多模态预训练模型在图像-文本理解任务中取得显著成果。然而，其庞大的参数量与推理开销限制了实际部署。</p>
 <p>在标签稀缺、资源受限的场景下，<strong>如何将大型 CLIP 模型的知识迁移到小模型中，同时不依赖大量标注数据？</strong></p>
-<p>这篇 CVPR 2024 论文《PromptKD》对此提出了解决方案。</p>
+<p>为降低计算代价并适应无标签场景，PromptKD 提出了一种核心思路：通过复用教师端文本类向量，将蒸馏聚焦于学生视觉提示的训练，从而绕过文本分支计算。</p>
 <hr>
 <h2 id="核心创新点"><a href="#核心创新点" class="headerlink" title="核心创新点"></a>核心创新点</h2><table>
 <thead>
@@ -614,20 +614,22 @@ mjx-container[display="true"] + br {
 <td>整个学生训练阶段不依赖任何人工标注数据</td>
 </tr>
 </tbody></table>
-<h2 id=""><a href="#" class="headerlink" title=""></a><img lazyload="" src="/images/loading.svg" data-src="/images/Papers/PromptKD/%E5%85%B3%E9%94%AE%E5%AF%B9%E6%AF%94%E5%9B%BE.png" alt="关键对比" title="关键对比"></h2><p>在PromptKD中，黄色的方块部分代表的就是教师CLIP，在教师CLIP经过训练之后，直接一次forward，得到并保存下来对应类别的text feaure，也就得到了图中的<strong>Pre-stored Text Feature</strong>。</p>
-<p>蓝色的方块代表的是学生CLIP，这里其实就只有一个image encoder，在带有learnablr prompt的输入进入image encoder之后会得到对应的image feature，这是因为与teacher text feature在维度上不匹配，所以经过一个Projector，将512转成768维的特征。然后再与Pre-stored Text Feature相乘，得到logits。</p>
-<p>然后进行蒸馏。</p>
+<h2 id=""><a href="#" class="headerlink" title=""></a><img lazyload="" src="/images/loading.svg" data-src="/images/Papers/PromptKD/%E5%85%B3%E9%94%AE%E5%AF%B9%E6%AF%94%E5%9B%BE.png" alt="关键对比" title="关键对比"></h2><ul>
+<li><p>在 PromptKD 的结构图中，黄色方块表示教师 CLIP 模型。教师在训练后，仅需将每类文本描述通过 Text Encoder 一次前向传播，生成并保存所有类别的文本特征（即图中的 <strong>Pre-stored Text Feature</strong>）。这一操作只做一次，后续不再计算文本分支。</p>
+</li>
+<li><p>蓝色方块为学生模型，结构上仅包含 Image Encoder 分支。输入图像拼接可学习的视觉提示（visual prompt）后，生成的 image feature 维度为 512。由于与教师生成的文本特征（768 维）不一致，因此通过一个 Projector 将其映射到相同维度。学生 logits 通过 image feature 与预存文本特征矩阵相乘获得，并与教师 logits 对齐进行 KL 蒸馏。整个学生训练过程完全基于无标签图像，推理也不再依赖文本分支，计算更高效。</p>
+</li>
+</ul>
 <hr>
 <h2 id="方法概览：PromptKD-的三阶段设计"><a href="#方法概览：PromptKD-的三阶段设计" class="headerlink" title="方法概览：PromptKD 的三阶段设计"></a>方法概览：PromptKD 的三阶段设计</h2><p>PromptKD 是一个 <strong>三阶段的无监督提示蒸馏框架</strong>，流程如下：<br> <img lazyload="" src="/images/loading.svg" data-src="/images/Papers/PromptKD/%E6%A0%B8%E5%BF%83%E6%A1%86%E6%9E%B6%E5%9B%BE.png" alt="网络框架" title="总体框架"></p>
 <ol>
-<li><strong>阶段 I - 教师预训练</strong><br>使用少量标注数据对大 CLIP 模型进行提示学习（如PromptSRC ）。文章中教师采用 ViT-L/14 CLIP模型，学生模型是ViT-B/16 CLIP模型</li>
-</ol>
+<li><p><strong>阶段 I - 教师预训练</strong><br>使用少量标注数据对大 CLIP 模型进行提示学习（如PromptSRC ）。文章中教师采用 ViT-L/14 CLIP模型，学生模型是ViT-B/16 CLIP模型<br>教师模型可选择直接使用 vanilla CLIP，也可通过 PromptSRC 等方法在目标域进行少量监督微调，以进一步提升蒸馏效果<br>(PromptSRC 是 PromptKD 中用于教师优化的前置工作，两者论文分别独立)</p>
 <blockquote>
 <p>注意，这里的预训练不是必须的一步，选择去预训练教师模型，是为了让教师有一个更好的性能，从而有更好的学生蒸馏结果。如果直接使用vanilla ViT-L/14 CLIP作为教师，相比于baseline，也取得了明显的性能提升 （作者博客）</p>
 </blockquote>
-<p>也就是说作者利用目标数据集对已经预先训练的教师模型进行微调，用于更好的指导学生网络</p>
-<ol start="2">
-<li><strong>阶段 II - 学生提示蒸馏</strong><br>在大量无标签图像上（包含测试集），冻结 CLIP 主干，仅训练可学习视觉编码器与投影器，使用教师输出作为软标签指导学生。</li>
+</li>
+<li><p><strong>阶段 II - 学生提示蒸馏</strong><br>在大量无标签图像上（包含测试集），冻结文本分支与大部分 CLIP 模块，仅训练视觉提示（Prompt）和映射层（Projector），使用教师输出作为软标签指导学生。</p>
+</li>
 </ol>
 <blockquote>
 <p>🔥 学生模型不再需要文本分支，仅复用教师的“类向量”，极大降低训练与推理开销。</p>
@@ -669,14 +671,129 @@ mjx-container[display="true"] + br {
 </tr>
 </tbody></table>
 <hr>
-<h2 id="局限性"><a href="#局限性" class="headerlink" title="局限性"></a>局限性</h2><h3 id="PromptKD-虽然脱离标签训练，但效果高度依赖于-unlabeled-数据的领域代表性。"><a href="#PromptKD-虽然脱离标签训练，但效果高度依赖于-unlabeled-数据的领域代表性。" class="headerlink" title="PromptKD 虽然脱离标签训练，但效果高度依赖于 unlabeled 数据的领域代表性。"></a>PromptKD 虽然脱离标签训练，但效果高度依赖于 <strong>unlabeled 数据的领域代表性</strong>。</h3><p>未来方向包括引入：</p>
+<h2 id="本地复现"><a href="#本地复现" class="headerlink" title="本地复现"></a>本地复现</h2><h3 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h3><p>一步步根据作者提供的步骤，在复现实验结果的过程中出现下述问题：</p>
+<blockquote>
+<p>AttributeError: module ‘distutils’ has no attribute ‘version’<br>环境中没有安装 distutils 模块（按照道理会自动安装的，可能是在conda在打包时遗漏了，毕竟都是python3.820了）</p>
+</blockquote>
+<p><strong>解决方法：</strong></p>
+<ol>
+<li>安装兼容模块</li>
+</ol>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pip install setuptools==58.0.4</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+<ol start="2">
+<li>或者加装补丁包</li>
+</ol>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">pip install distutils</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+<p>为提高兼容性，将 python 环境 提升到 python 3.9<br>综上，要最后加上下述的命令：</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 降级 numpy 到兼容版本</span></span><br><span class="line">pip install numpy==1.24.4</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装 distutils 支持</span></span><br><span class="line">pip install setuptools==58.0.4</span><br><span class="line"></span><br><span class="line"><span class="comment"># 确保 tensorboard 可用</span></span><br><span class="line">pip install tensorboard</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+<hr>
+<h3 id="复现实验设置"><a href="#复现实验设置" class="headerlink" title="复现实验设置"></a>复现实验设置</h3><table>
+<thead>
+<tr>
+<th>模块</th>
+<th>内容说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>教师模型</td>
+<td>ViT-L/14 + Few-shot 标签（每类16张图）+ PromptSRC 引导</td>
+</tr>
+<tr>
+<td>学生模型</td>
+<td>ViT-B/16，仅训练视觉 prompt 和投影层</td>
+</tr>
+<tr>
+<td>蒸馏方式</td>
+<td>KL散度对齐教师-学生 logits（无标签，transductive zero-shot setting）</td>
+</tr>
+<tr>
+<td>文本分支</td>
+<td>教师模型生成 class vectors，一次提取，冻结使用</td>
+</tr>
+<tr>
+<td>训练数据</td>
+<td>无标注图像数据（仅用于蒸馏）</td>
+</tr>
+<tr>
+<td>评估指标</td>
+<td>base / novel 准确率，harmonic mean，cross-dataset 迁移能力</td>
+</tr>
+<tr>
+<td>实验设置</td>
+<td>- Few-shot 训练教师；<br> - Zero-shot 蒸馏学生；<br> - 多数据集迁移测试</td>
+</tr>
+</tbody></table>
+<h3 id="复现结果"><a href="#复现结果" class="headerlink" title="复现结果"></a>复现结果</h3><p>在论文中提到的10给数据集中，我选择在 DTD 、Flowers102 、Caltech101 这三个数据集上复现 Base2novel 与 Cross-dataset 实验(+ 与 - 表示与论文中结果的差异)。</p>
+<ol>
+<li><strong>Base2Novel (inductive)</strong></li>
+</ol>
+<p>Novel 类 仅在测试阶段出现，训练过程无参与</p>
+<table>
+<thead>
+<tr>
+<th>数据集</th>
+<th>Base</th>
+<th>Novel</th>
+<th>HM</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>DTD</td>
+<td>84.4 (-1.4)</td>
+<td>70.4 (-0.9)</td>
+<td>76.7 (-1.2)</td>
+</tr>
+<tr>
+<td>Flowers102</td>
+<td>94.5 (-4.9)</td>
+<td>79.6 (-3.02)</td>
+<td>86.4 (-3.84)</td>
+</tr>
+<tr>
+<td>Caltech101</td>
+<td>99 (+1.09)</td>
+<td>96.4 (-0.25)</td>
+<td>97.6 (-0.17)</td>
+</tr>
+</tbody></table>
+<ol start="2">
+<li><strong>Cross-Dataset (transductive)</strong></li>
+</ol>
+<p>本复现实验同样采用 <strong>Transductive</strong> 设定，即在无标签但包含测试类别的图像上进行训练<br>Cross-Dataset中，教师模型现在ImageNet数据集上做训练，而后再不同的数据集上做无标签蒸馏（包含测试集）最后做测试</p>
+<table>
+<thead>
+<tr>
+<th>数据集</th>
+<th>Acc</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>DTD</td>
+<td>53.7 (-1.38)</td>
+</tr>
+<tr>
+<td>Flowers102</td>
+<td>74.9 (-0.4)</td>
+</tr>
+<tr>
+<td>Caltech101</td>
+<td>93.3 (-0.31)</td>
+</tr>
+</tbody></table>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>在 Base2Novel 和 Cross-Dataset 实验中，Caltech101 数据集的复现效果最佳，DTD 和 Flowers102 数据集的准确率相对较低，尤其是在 Base2Novel 实验中的表现差异较大。</p>
+<p>由于我只取一个随机数实验一次，难免会有误差，就结果而言该模型的表现尚可</p>
+<hr>
+<h2 id="局限"><a href="#局限" class="headerlink" title="局限"></a>局限</h2><h3 id="PromptKD-虽然脱离标签训练，但效果高度依赖于-unlabeled-数据的领域代表性。"><a href="#PromptKD-虽然脱离标签训练，但效果高度依赖于-unlabeled-数据的领域代表性。" class="headerlink" title="PromptKD 虽然脱离标签训练，但效果高度依赖于 unlabeled 数据的领域代表性。"></a>PromptKD 虽然脱离标签训练，但效果高度依赖于 <strong>unlabeled 数据的领域代表性</strong>。</h3><p>未来方向包括引入：</p>
 <ul>
 <li>跨域正则化</li>
 <li>自适应提示生成</li>
 <li>更强的鲁棒蒸馏策略</li>
 </ul>
 <hr>
-<h3 id="用整个数据集蒸馏"><a href="#用整个数据集蒸馏" class="headerlink" title="用整个数据集蒸馏"></a>用整个数据集蒸馏</h3><p><img lazyload="" src="/images/loading.svg" data-src="/images/Papers/PromptKD/%E5%8E%9F%E6%96%871.png" alt="原文1" title="论文原文"><br>如原文所述，作者采取的是<strong>transductive</strong>方法，这在student蒸馏阶段使用了完整的包含测试集再类的所有数据进行蒸馏学习（不含测试集标签）</p>
+<h3 id="用整个数据集蒸馏"><a href="#用整个数据集蒸馏" class="headerlink" title="用整个数据集蒸馏"></a>用整个数据集蒸馏</h3><p><img lazyload="" src="/images/loading.svg" data-src="/images/Papers/PromptKD/%E5%8E%9F%E6%96%871.png" alt="原文1" title="论文原文"><br>如原文所述，在 Cross-Dataset 实验中，PromptKD 采用 transductive 设置：学生模型在蒸馏阶段可访问目标域中所有未标注图像（包含 unseen 类），但不使用其标签信息。</p>
 <p> <strong>Inductive vs Transductive Zero-Shot Learning 对比表</strong></p>
 <table>
 <thead>
@@ -717,9 +834,13 @@ mjx-container[display="true"] + br {
 <td>过拟合测试集结构、部署时难以获得 unlabeled 测试图像</td>
 </tr>
 </tbody></table>
-<p>这也涉及到了工业界与学术界的分歧。学术界过度强调 few-shot 设置，而工业界更加关注如何有效利用 海量无标签数据。</p>
-<p>在工业实际应用场景（industrial setting）中，企业并不会像学术论文那样刻意限制每类只使用 1/2/4 张有标签样本（即 1-shot、2-shot、4-shot 学习），而是更关注怎么用尽可能多的数据来提升模型效果。</p>
-<p>在我看来PromptKD 更贴近工业需求 。</p>
+<p>值得注意的是，PromptKD 在 Cross-Dataset 实验中采用了 transductive 蒸馏策略，即在训练阶段使用了目标域中的所有未标注图像（包含测试类），从而显著提升了学生模型对 unseen 类的泛化性能。</p>
+<p>虽然这一策略在工业应用中确实更具可操作性（实际部署时常常拥有大量未标注的测试域数据），但从学术研究的角度看，这种设置一定程度上放宽了 zero-shot 学习中对泛化能力的严格要求。特别是在某些严格 ZSL 定义下，transductive 被视为“信息泄露”，可能影响模型的真实零样本泛化评价。</p>
+<p>从这个角度来看，PromptKD 的实验结果固然令人印象深刻，但在评估其方法的通用性时，需要将其与严格 inductive 设置下的方法区分看待(但作者比较的很多方法都是inductive的)</p>
+<h2 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h2><h3 id="1-蒸馏机制设计尚显浅层"><a href="#1-蒸馏机制设计尚显浅层" class="headerlink" title="1. 蒸馏机制设计尚显浅层"></a>1. 蒸馏机制设计尚显浅层</h3><p>我认为，作者最大的贡献在于充分利用了 CLIP 模型中视觉端与文本端解耦的结构特点，在学生蒸馏阶段通过复用教师侧生成的类文本向量，实现了无需文本分支的轻量化蒸馏训练。这一设计不仅有效提升了模型推理效率，同时也取得了优异的性能表现。</p>
+<p>然而，论文在蒸馏模块的设计上仍显初步，采用的仅是最基础的 KL 散度损失，蒸馏过程局限于输出层（logits）的对齐，未能进一步挖掘模型结构层级中的语义特征或类间关系作为更深层次的知识迁移信号。</p>
+<p>因此，我认为在 PromptKD 的基础上，若能增强蒸馏模块，引入更丰富的蒸馏策略（如中间层特征对齐、类中心对齐），或许可以进一步提升其在跨域迁移与低资源场景下的鲁棒性与泛化能力。</p>
+<h3 id="2-训练设置依赖-Transductive-假设"><a href="#2-训练设置依赖-Transductive-假设" class="headerlink" title="2. 训练设置依赖 Transductive 假设"></a>2. 训练设置依赖 Transductive 假设</h3><p> 在 cross-dataset 实验中，PromptKD 采用 transductive ZSL 设定 ，这或许存在刷数据的嫌疑。未来可进一步探讨其在 inductive 条件下的泛化能力，验证方法本身的更强迁移性与适应性。</p>
 <h2 id="论文资源区块"><a href="#论文资源区块" class="headerlink" title="论文资源区块"></a>论文资源区块</h2><ul>
 <li><strong>PDF</strong>：<a class="link" target="_blank" rel="noopener" href="https://openaccess.thecvf.com/content/CVPR2024/papers/Li_PromptKD_Unsupervised_Prompt_Distillation_for_Vision-Language_Models_CVPR_2024_paper.pdf">下载链接<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
 <li><strong>代码仓库</strong>：<a class="link" target="_blank" rel="noopener" href="https://github.com/zhengli97/PromptKD">GitHub - zhengli97/PromptKD<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
@@ -740,7 +861,7 @@ mjx-container[display="true"] + br {
         
             <li>
                 <strong>Updated at
-                    :</strong> 2025-05-05 15:13:15
+                    :</strong> 2025-05-06 11:20:51
             </li>
         
         <li>
@@ -854,7 +975,7 @@ mjx-container[display="true"] + br {
 	<div class="post-toc">
 		<div class="toc-title">On this page</div>
 		<div class="page-title">论文 - PromptKD: Unsupervised Prompt Distillation for Vision-Language Models</div>
-		<ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E4%BF%A1%E6%81%AF"><span class="nav-text">论文信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%EF%BC%9A%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%8E%8B%E7%BC%A9%E7%9A%84%E6%96%B0%E6%8C%91%E6%88%98"><span class="nav-text">背景：大模型压缩的新挑战</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E5%88%9B%E6%96%B0%E7%82%B9"><span class="nav-text">核心创新点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-text"></span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E6%A6%82%E8%A7%88%EF%BC%9APromptKD-%E7%9A%84%E4%B8%89%E9%98%B6%E6%AE%B5%E8%AE%BE%E8%AE%A1"><span class="nav-text">方法概览：PromptKD 的三阶段设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="nav-text">实验结果</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E8%A1%A1%E9%87%8F%E6%8C%87%E6%A0%87"><span class="nav-text">实验衡量指标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cross-dataset-Generalization"><span class="nav-text">Cross-dataset Generalization</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8E-Few-shot-%E4%BC%AA%E6%A0%87%E7%AD%BE%E6%96%B9%E6%B3%95%E5%AF%B9%E6%AF%94"><span class="nav-text">与 Few-shot&#x2F;伪标签方法对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A8%E7%90%86%E6%95%88%E7%8E%87%E6%98%BE%E8%91%97%E6%8F%90%E5%8D%87"><span class="nav-text">推理效率显著提升</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B1%80%E9%99%90%E6%80%A7"><span class="nav-text">局限性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PromptKD-%E8%99%BD%E7%84%B6%E8%84%B1%E7%A6%BB%E6%A0%87%E7%AD%BE%E8%AE%AD%E7%BB%83%EF%BC%8C%E4%BD%86%E6%95%88%E6%9E%9C%E9%AB%98%E5%BA%A6%E4%BE%9D%E8%B5%96%E4%BA%8E-unlabeled-%E6%95%B0%E6%8D%AE%E7%9A%84%E9%A2%86%E5%9F%9F%E4%BB%A3%E8%A1%A8%E6%80%A7%E3%80%82"><span class="nav-text">PromptKD 虽然脱离标签训练，但效果高度依赖于 unlabeled 数据的领域代表性。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%95%B4%E4%B8%AA%E6%95%B0%E6%8D%AE%E9%9B%86%E8%92%B8%E9%A6%8F"><span class="nav-text">用整个数据集蒸馏</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E8%B5%84%E6%BA%90%E5%8C%BA%E5%9D%97"><span class="nav-text">论文资源区块</span></a></li></ol>
+		<ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E4%BF%A1%E6%81%AF"><span class="nav-text">论文信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%EF%BC%9A%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%8E%8B%E7%BC%A9%E7%9A%84%E6%96%B0%E6%8C%91%E6%88%98"><span class="nav-text">背景：大模型压缩的新挑战</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E5%88%9B%E6%96%B0%E7%82%B9"><span class="nav-text">核心创新点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link"><span class="nav-text"></span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E6%A6%82%E8%A7%88%EF%BC%9APromptKD-%E7%9A%84%E4%B8%89%E9%98%B6%E6%AE%B5%E8%AE%BE%E8%AE%A1"><span class="nav-text">方法概览：PromptKD 的三阶段设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="nav-text">实验结果</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E8%A1%A1%E9%87%8F%E6%8C%87%E6%A0%87"><span class="nav-text">实验衡量指标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cross-dataset-Generalization"><span class="nav-text">Cross-dataset Generalization</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8E-Few-shot-%E4%BC%AA%E6%A0%87%E7%AD%BE%E6%96%B9%E6%B3%95%E5%AF%B9%E6%AF%94"><span class="nav-text">与 Few-shot&#x2F;伪标签方法对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A8%E7%90%86%E6%95%88%E7%8E%87%E6%98%BE%E8%91%97%E6%8F%90%E5%8D%87"><span class="nav-text">推理效率显著提升</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E5%A4%8D%E7%8E%B0"><span class="nav-text">本地复现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE"><span class="nav-text">环境配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%8D%E7%8E%B0%E5%AE%9E%E9%AA%8C%E8%AE%BE%E7%BD%AE"><span class="nav-text">复现实验设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%8D%E7%8E%B0%E7%BB%93%E6%9E%9C"><span class="nav-text">复现结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B1%80%E9%99%90"><span class="nav-text">局限</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PromptKD-%E8%99%BD%E7%84%B6%E8%84%B1%E7%A6%BB%E6%A0%87%E7%AD%BE%E8%AE%AD%E7%BB%83%EF%BC%8C%E4%BD%86%E6%95%88%E6%9E%9C%E9%AB%98%E5%BA%A6%E4%BE%9D%E8%B5%96%E4%BA%8E-unlabeled-%E6%95%B0%E6%8D%AE%E7%9A%84%E9%A2%86%E5%9F%9F%E4%BB%A3%E8%A1%A8%E6%80%A7%E3%80%82"><span class="nav-text">PromptKD 虽然脱离标签训练，但效果高度依赖于 unlabeled 数据的领域代表性。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%95%B4%E4%B8%AA%E6%95%B0%E6%8D%AE%E9%9B%86%E8%92%B8%E9%A6%8F"><span class="nav-text">用整个数据集蒸馏</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%9D%E8%80%83"><span class="nav-text">思考</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E8%92%B8%E9%A6%8F%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1%E5%B0%9A%E6%98%BE%E6%B5%85%E5%B1%82"><span class="nav-text">1. 蒸馏机制设计尚显浅层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%AE%AD%E7%BB%83%E8%AE%BE%E7%BD%AE%E4%BE%9D%E8%B5%96-Transductive-%E5%81%87%E8%AE%BE"><span class="nav-text">2. 训练设置依赖 Transductive 假设</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E8%B5%84%E6%BA%90%E5%8C%BA%E5%9D%97"><span class="nav-text">论文资源区块</span></a></li></ol>
 
 	</div>
 </div>
