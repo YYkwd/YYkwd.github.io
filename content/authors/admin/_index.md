@@ -31,14 +31,14 @@ organizations:
 # Need to use another icon? Simply download the SVG icon to your `assets/media/icons/` folder.
 profiles:
   - icon: at-symbol
-    url: 'yiyk5522@mails.jlu.edu.cn'
+    url: 'mailto:yiyk5522@mails.jlu.edu.cn'
     label: E-mail Me
   # - icon: brands/x
   #   url: https://twitter.com/GetResearchDev
   # - icon: brands/instagram
   #   url: https://www.instagram.com/
-  # - icon: brands/github
-  #   url: https://github.com/gcushen
+  - icon: brands/github
+    url: https://github.com/YYkwd
   # - icon: brands/linkedin
   #   url: https://www.linkedin.com/
   # - icon: academicons/google-scholar
