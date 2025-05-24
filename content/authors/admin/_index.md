@@ -1,17 +1,17 @@
 ---
 # Display name
-title: 吳健雄
+title: 易永康
 
 # Name pronunciation (optional)
-name_pronunciation: Chien Shiung Wu
+name_pronunciation: Yi Yong Kang 
 
 # Full name (for SEO)
-first_name: Shiung Wu
-last_name: Chien
+first_name: 永康
+last_name: 易
 
 # Status emoji
 status:
-  icon: ☕️
+  icon: 🌧
 
 # Is this the primary user of the site?
 superuser: true
@@ -20,44 +20,46 @@ superuser: true
 highlight_name: true
 
 # Role/position/tagline
-role: Chief Scientist
+role: 软件工程专业本科生 @ 吉林大学
 
 # Organizations/Affiliations to display in Biography blox
 organizations:
-  - name: OpenAI
-    url: https://openai.com/
+  - name: 吉林大学软件学院
+    url: https://www.jlu.edu.cn/
 
 # Social network links
 # Need to use another icon? Simply download the SVG icon to your `assets/media/icons/` folder.
 profiles:
   - icon: at-symbol
-    url: 'mailto:your-email@example.com'
+    url: 'yiyk5522@mails.jlu.edu.cn'
     label: E-mail Me
-  - icon: brands/x
-    url: https://twitter.com/GetResearchDev
-  - icon: brands/instagram
-    url: https://www.instagram.com/
-  - icon: brands/github
-    url: https://github.com/gcushen
-  - icon: brands/linkedin
-    url: https://www.linkedin.com/
-  - icon: academicons/google-scholar
-    url: https://scholar.google.com/
-  - icon: academicons/orcid
-    url: https://orcid.org/
+  # - icon: brands/x
+  #   url: https://twitter.com/GetResearchDev
+  # - icon: brands/instagram
+  #   url: https://www.instagram.com/
+  # - icon: brands/github
+  #   url: https://github.com/gcushen
+  # - icon: brands/linkedin
+  #   url: https://www.linkedin.com/
+  # - icon: academicons/google-scholar
+  #   url: https://scholar.google.com/
+  # - icon: academicons/orcid
+  #   url: https://orcid.org/
 
 interests:
-  - Artificial Intelligence
-  - Computational Linguistics
-  - Information Retrieval
+  - 人工智能
+  - 开源项目
+  - 跑步与音乐
 
 education:
-  - area: PhD Artificial Intelligence
-    institution: Stanford University
-    date_start: 2016-01-01
-    date_end: 2020-12-31
+  education:
+  - area: 软件工程 本科
+    institution: 吉林大学
+    date_start: 2022-09-01
+    date_end: 2026-06-30
     summary: |
-      Thesis on _Why LLMs are awesome_. Supervised by [Prof Joe Smith](https://example.com). Presented papers at 5 IEEE conferences with the contributions being published in 2 Springer journals.
+      GPA：3.7/4.0，主修课程包括操作系统、数据库、人工智能、软件工程、编译原理等。
+
     button:
       text: 'Read Thesis'
       url: 'https://example.com'
@@ -84,28 +86,28 @@ education:
       - lorem ipsum dolor sit amet, consectetur adipiscing elit
       - lorem ipsum dolor sit amet, consectetur adipiscing elit
 work:
-  - position: Director of Cloud Infrastructure
-    company_name: GenCoin
-    company_url: ''
-    company_logo: ''
-    date_start: 2021-01-01
-    date_end: ''
-    summary: |2-
-      Responsibilities include:
-      - lorem ipsum dolor sit amet, consectetur adipiscing elit
-      - lorem ipsum dolor sit amet, consectetur adipiscing elit
-      - lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - position: Backend Software Engineer
-    company_name: X
-    company_url: ''
-    company_logo: ''
-    date_start: 2016-01-01
-    date_end: 2020-12-31
-    summary: |
-      Responsibilities include:
-      - Migrated infrastructure to a new data center
-      - lorem ipsum dolor sit amet, consectetur adipiscing elit
-      - lorem ipsum dolor sit amet, consectetur adipiscing elit
+  # - position: Director of Cloud Infrastructure
+  #   company_name: GenCoin
+  #   company_url: ''
+  #   company_logo: ''
+  #   date_start: 2021-01-01
+  #   date_end: ''
+  #   summary: |2-
+  #     Responsibilities include:
+  #     - lorem ipsum dolor sit amet, consectetur adipiscing elit
+  #     - lorem ipsum dolor sit amet, consectetur adipiscing elit
+  #     - lorem ipsum dolor sit amet, consectetur adipiscing elit
+  # - position: Backend Software Engineer
+  #   company_name: X
+  #   company_url: ''
+  #   company_logo: ''
+  #   date_start: 2016-01-01
+  #   date_end: 2020-12-31
+  #   summary: |
+  #     Responsibilities include:
+  #     - Migrated infrastructure to a new data center
+  #     - lorem ipsum dolor sit amet, consectetur adipiscing elit
+  #     - lorem ipsum dolor sit amet, consectetur adipiscing elit
 
 # Skills
 # Add your own SVG icons to `assets/media/icons/`
@@ -116,13 +118,13 @@ skills:
         description: ''
         percent: 80
         icon: code-bracket
-      - name: Data Science
+      - name: C++
         description: ''
-        percent: 100
+        percent: 90
         icon: chart-bar
-      - name: SQL
+      - name: C
         description: ''
-        percent: 40
+        percent: 85
         icon: circle-stack
   - name: Hobbies
     color: '#eeac02'
@@ -183,4 +185,5 @@ awards:
 
 ## About Me
 
-Chien Shiung Wu is a professor of artificial intelligence at the Stanford AI Lab. Her research interests include distributed robotics, mobile computing and programmable matter. She leads the Robotic Neurobiology group, which develops self-reconfiguring robots, systems of self-organizing robots, and mobile sensor networks.
+I'm Yongkang Yi, a student at the School of Software, Jilin University. I’m passionate about AI, backend development, and engineering projects. Currently, I’m exploring large language models, multi-view clustering, and knowledge distillation. Feel free to connect and collaborate!
+
