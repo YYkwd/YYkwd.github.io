@@ -47,9 +47,10 @@ profiles:
   #   url: https://orcid.org/
 
 interests:
-  - 人工智能
-  - 开源项目
-  - 跑步与音乐
+  - Artificial Intelligence
+  - Open Source Projects
+  - Running and Music
+
 
 education:
   - area: Bachelor of Software Engineering
@@ -155,7 +156,7 @@ awards:
     date: '2024-10-01'
     summary: |
       Awarded for outstanding academic and overall performance in the 2023–2024 academic year.
-      
+
   - title: Jilin University Second-Class Scholarship
     awarder: Jilin University
     date: '2023-10-01'
