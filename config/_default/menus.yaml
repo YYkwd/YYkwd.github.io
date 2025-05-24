@@ -19,9 +19,9 @@ main:
   - name: Experience
     url: experience/
     weight: 20
-  - name: Projects
-    url: projects/
-    weight: 30
+  # - name: Projects
+  #   url: projects/
+  #   weight: 30
   - name: Blog
     url: https://yykwd.github.io/blog
     weight: 40
