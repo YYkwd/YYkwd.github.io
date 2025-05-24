@@ -52,7 +52,6 @@ interests:
   - 跑步与音乐
 
 education:
-  education:
   - area: 软件工程 本科
     institution: 吉林大学
     date_start: 2022-09-01
