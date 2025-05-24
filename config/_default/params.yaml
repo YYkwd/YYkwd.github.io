@@ -6,7 +6,9 @@
 # Appearance
 appearance:
   mode: system
-  color: emerald
+  # color: emerald
+  color: sky
+
 
 # SEO
 marketing:
@@ -35,7 +37,7 @@ header:
     show_search: true
     show_theme_chooser: true
     logo:
-      text: "Your Name"
+      text: "Yi Yongkang"
 
 # Site footer
 footer:
