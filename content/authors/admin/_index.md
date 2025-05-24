@@ -149,23 +149,23 @@ languages:
 #   Only `title`, `awarder`, and `date` are required.
 #   Begin multi-line `summary` with YAML's `|` or `|2-` multi-line prefix and indent 2 spaces below.
 awards:
-  - title: Second Prize (National Level), Contemporary Undergraduate Mathematical Contest in Modeling (CUMCM)
-    awarder: China Society for Industrial and Applied Mathematics (CSIAM)
-    date: '2023-09-01'
-    summary: |
-      Awarded the National Second Prize in the 2023 CUMCM (本科组), a prestigious modeling competition for undergraduate students in China.
-
-  - title: Jilin University Second-Class Scholarship
-    awarder: Jilin University
-    date: '2023-10-01'
-    summary: |
-      Awarded for excellent academic performance in the 2022–2023 academic year.
 
   - title: Jilin University First-Class Scholarship
     awarder: Jilin University
     date: '2024-10-01'
     summary: |
       Awarded for outstanding academic and overall performance in the 2023–2024 academic year.
+      
+  - title: Jilin University Second-Class Scholarship
+    awarder: Jilin University
+    date: '2023-10-01'
+    summary: |
+      Awarded for excellent academic performance in the 2022–2023 academic year.
+  - title: Second Prize (National Level), Contemporary Undergraduate Mathematical Contest in Modeling (CUMCM)
+    awarder: China Society for Industrial and Applied Mathematics (CSIAM)
+    date: '2023-09-01'
+    summary: |
+      Awarded the National Second Prize in the 2023 CUMCM (本科组), a prestigious modeling competition for undergraduate students in China.
   # - title: Neural Networks and Deep Learning
   #   url: https://www.coursera.org/learn/neural-networks-deep-learning
   #   date: '2023-11-25'
