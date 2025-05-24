@@ -141,7 +141,7 @@ languages:
     percent: 100
   - name: Chinese
     percent: 75
-- name: Japanese
+  - name: Japanese
     percent: 20
 
 # Awards.
