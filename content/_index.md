@@ -41,6 +41,7 @@ sections:
         - Large Language Models (LLMs)
         - Multi-view Clustering
         - Knowledge Distillation
+        - Recommender Systems
 
         I enjoy exploring intelligent systems through both theoretical insights and practical engineering.
 
